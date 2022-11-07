@@ -1,0 +1,69 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Set P4D Suite Paths'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Client
+    Size.Width = 640.000000000000000000
+    Size.Height = 423.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Viewport.Width = 636.000000000000000000
+    Viewport.Height = 419.000000000000000000
+  end
+  object Panel1: TPanel
+    Align = Bottom
+    Position.Y = 440.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object Button1: TButton
+      Anchors = [akTop, akRight]
+      Position.X = 552.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 1
+      Text = 'Set Paths'
+      OnClick = Button1Click
+    end
+    object ComboBox1: TComboBox
+      Anchors = [akTop, akRight]
+      Position.X = 276.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 268.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      OnChange = ComboBox1Change
+    end
+    object Button2: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 4
+      Text = 'Select Folder'
+      OnClick = Button2Click
+    end
+  end
+  object Label1: TLabel
+    Align = Bottom
+    Margins.Left = 12.000000000000000000
+    Margins.Right = 12.000000000000000000
+    Position.X = 12.000000000000000000
+    Position.Y = 423.000000000000000000
+    Size.Width = 616.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'P4D Suite Folder : '
+    TabOrder = 3
+  end
+end
