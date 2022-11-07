@@ -93,7 +93,7 @@ begin
   DelphiList := TStringList.Create;
   GetDelphiList(DelphiList);
 
-  if DelphiList.Count > 1 then
+  if DelphiList.Count > 0 then
     begin
       ComboBox1.Enabled := True;
       for I := 0 to DelphiList.Count - 1 do
