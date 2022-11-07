@@ -28,9 +28,13 @@ type
     DelphiPrettyName: TStringList;
     DelphiList: TStringList;
     SelectedDelphiVersion: TDelphiVersion;
+    procedure RemovePackagePaths(const PackagePath: String);
+    procedure RemovePath(var SomePaths: String; const PathToRemove: String; const Exact: Boolean = False);
+    procedure AddPackagePaths(const PackagePath: String);
+    procedure AddPath(var SomePaths: String; const PathToAdd: String);
     procedure MakeDelphiPrettyNames;
     procedure GetDelphiVersions;
-    procedure ShowSelectedDelphi;
+    procedure ShowSelectedDelphi(const Clear: Boolean = True);
   public
     { Public declarations }
   end;
@@ -52,12 +56,139 @@ const
 
 {$R *.fmx}
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.RemovePath(var SomePaths: String; const PathToRemove: String; const Exact: Boolean = False);
+var
+  Dirs: TStringList;
+  I: Integer;
 begin
-//  ShowSelectedDelphi;
+  Dirs := TStringList.Create;
+  SplitPaths(SomePaths, Dirs);
+
+  for I := Dirs.Count - 1 downto 0 do
+    begin
+      if Exact then
+        begin
+          if Dirs[I] = PathToRemove then
+            Dirs.Delete(I);
+        end
+      else
+        begin
+          if Dirs[I].Contains(PathToRemove) then
+            Dirs.Delete(I);
+        end
+    end;
+
+  SomePaths := JoinPaths(Dirs);
+  Dirs.Free;
 end;
 
-procedure TForm1.ShowSelectedDelphi;
+procedure TForm1.AddPath(var SomePaths: String; const PathToAdd: String);
+var
+  Dirs: TStringList;
+begin
+  Dirs := TStringList.Create;
+  SplitPaths(SomePaths, Dirs);
+
+  Dirs.Add(PathToAdd);
+
+  SomePaths := JoinPaths(Dirs);
+  Dirs.Free;
+end;
+
+procedure TForm1.RemovePackagePaths(const PackagePath: String);
+begin
+  if PackagePath = P4DPE then
+    begin
+      RemovePath(SelectedDelphiVersion.Win32.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Win32.DebugDCUPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Win64.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Win64.DebugDCUPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Linux64.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Linux64.DebugDCUPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Android32.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Android32.DebugDCUPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Android64.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.Android64.DebugDCUPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.OSXARM64.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.OSXARM64.DebugDCUPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.OSX64.SearchPath, PackagePath + '\src\AddOn');
+      RemovePath(SelectedDelphiVersion.OSX64.DebugDCUPath, PackagePath + '\src\AddOn');
+    end;
+
+  RemovePath(SelectedDelphiVersion.Win32.SearchPath, PackagePath + '\lib\Win32\Release');
+  RemovePath(SelectedDelphiVersion.Win32.DebugDCUPath, PackagePath + '\lib\Win32\Debug');
+  RemovePath(SelectedDelphiVersion.Win64.SearchPath, PackagePath + '\lib\Win64\Release');
+  RemovePath(SelectedDelphiVersion.Win64.DebugDCUPath, PackagePath + '\lib\Win64\Debug');
+  RemovePath(SelectedDelphiVersion.Linux64.SearchPath, PackagePath + '\lib\Linux64\Release');
+  RemovePath(SelectedDelphiVersion.Linux64.DebugDCUPath, PackagePath + '\lib\Linux64\Debug');
+  RemovePath(SelectedDelphiVersion.Android32.SearchPath, PackagePath + '\lib\Android32\Release');
+  RemovePath(SelectedDelphiVersion.Android32.DebugDCUPath, PackagePath + '\lib\Android32\Debug');
+  RemovePath(SelectedDelphiVersion.Android64.SearchPath, PackagePath + '\lib\Android64\Release');
+  RemovePath(SelectedDelphiVersion.Android64.DebugDCUPath, PackagePath + '\lib\Android64\Debug');
+  RemovePath(SelectedDelphiVersion.OSXARM64.SearchPath, PackagePath + '\lib\OSXARM64\Release');
+  RemovePath(SelectedDelphiVersion.OSXARM64.DebugDCUPath, PackagePath + '\lib\OSXARM64\Debug');
+  RemovePath(SelectedDelphiVersion.OSX64.SearchPath, PackagePath + '\lib\OSX64\Release');
+  RemovePath(SelectedDelphiVersion.OSX64.DebugDCUPath, PackagePath + '\lib\OSX64\Debug');
+end;
+
+procedure TForm1.AddPackagePaths(const PackagePath: String);
+begin
+  if PackagePath = P4DPE then
+    begin
+      AddPath(SelectedDelphiVersion.Win32.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Win32.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Win64.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Win64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Linux64.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Linux64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Android32.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Android32.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Android64.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.Android64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.OSXARM64.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.OSXARM64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.OSX64.SearchPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+      AddPath(SelectedDelphiVersion.OSX64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\src\AddOn');
+    end;
+  AddPath(SelectedDelphiVersion.Win32.SearchPath, P4DFolder + '\' + PackagePath + '\lib\Win32\Release');
+  AddPath(SelectedDelphiVersion.Win32.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\Win32\Debug');
+  AddPath(SelectedDelphiVersion.Win64.SearchPath, P4DFolder + '\' + PackagePath + '\lib\Win64\Release');
+  AddPath(SelectedDelphiVersion.Win64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\Win64\Debug');
+  AddPath(SelectedDelphiVersion.Linux64.SearchPath, P4DFolder + '\' + PackagePath + '\lib\Linux64\Release');
+  AddPath(SelectedDelphiVersion.Linux64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\Linux64\Debug');
+  AddPath(SelectedDelphiVersion.Android32.SearchPath, P4DFolder + '\' + PackagePath + '\lib\Android32\Release');
+  AddPath(SelectedDelphiVersion.Android32.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\Android32\Debug');
+  AddPath(SelectedDelphiVersion.Android64.SearchPath, P4DFolder + '\' + PackagePath + '\lib\Android64\Release');
+  AddPath(SelectedDelphiVersion.Android64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\Android64\Debug');
+  AddPath(SelectedDelphiVersion.OSXARM64.SearchPath, P4DFolder + '\' + PackagePath + '\lib\OSXARM64\Release');
+  AddPath(SelectedDelphiVersion.OSXARM64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\OSXARM64\Debug');
+  AddPath(SelectedDelphiVersion.OSX64.SearchPath, P4DFolder + '\' + PackagePath + '\lib\OSX64\Release');
+  AddPath(SelectedDelphiVersion.OSX64.DebugDCUPath, P4DFolder + '\' + PackagePath + '\lib\OSX64\Debug');
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  if P4DFolder <> String.Empty then
+    begin
+      RemovePackagePaths(P4DLW);
+      RemovePackagePaths(P4DDS);
+      RemovePackagePaths(P4DPE);
+      RemovePackagePaths(P4DPP);
+      RemovePackagePaths(P4DPD);
+
+      AddPackagePaths(P4DLW);
+      AddPackagePaths(P4DDS);
+      AddPackagePaths(P4DPE);
+      AddPackagePaths(P4DPP);
+      AddPackagePaths(P4DPD);
+
+      WriteDelphiInfo(SelectedDelphiVersion, SelectedDelphiVersion.BDSVer);
+
+      ShowSelectedDelphi(False);
+    end;
+end;
+
+procedure TForm1.ShowSelectedDelphi(const Clear: Boolean = True);
 var
   Dirs: TStringList;
   Joined: String;
@@ -65,7 +196,8 @@ begin
   if Assigned(SelectedDelphiVersion) then
     begin
       Dirs := TStringList.Create;
-      Memo1.Lines.Clear;
+      if Clear then
+        Memo1.Lines.Clear;
       Memo1.Lines.Add('BDS Ver : ' + SelectedDelphiVersion.BDSVer);
       Memo1.Lines.Add('App Loc : ' + SelectedDelphiVersion.AppLoc);
       Memo1.Lines.Add('App Ver : ' + SelectedDelphiVersion.AppVer);
@@ -125,10 +257,26 @@ begin
     InitialDir := TPath.GetSharedDocumentsPath
   else
     InitialDir := P4DFolder;
-
+{ Reminder
+  P4DLW = 'Lightweight-Python-Wrappers';
+  P4DDS = 'P4D-Data-Sciences';
+  P4DPE = 'PythonEnviroments';
+  P4DPP = 'PythonPackages4Delphi';
+  P4DPD = 'python4delphi';
+}
   if SelectDirectory('Export Component Package as a Folder', InitialDir, P4DFolder) then
     begin
-      Label1.Text := 'P4D Suite Folder : ' + P4DFolder;
+      if DirectoryExists(P4DFolder + '\' + P4DLW) and
+         DirectoryExists(P4DFolder + '\' + P4DDS) and
+         DirectoryExists(P4DFolder + '\' + P4DPE) and
+         DirectoryExists(P4DFolder + '\' + P4DPP) and
+         DirectoryExists(P4DFolder + '\' + P4DPD) then
+        Label1.Text := 'P4D Suite Folder : ' + P4DFolder
+      else
+        begin
+          Label1.Text := 'P4D Suite Folder : ';
+          P4DFolder := String.Empty;
+        end;
     end;
 end;
 

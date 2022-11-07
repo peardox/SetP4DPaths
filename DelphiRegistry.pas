@@ -67,6 +67,8 @@ function GetComponentList(var ComponentList: TStringList; const DelphiVersion: S
 function GetDelphiList(var ADelphiList: TStringList): Boolean;
 function FindAllDescendantsOf(basetype: TClass): TList<TClass>;
 function FileVersion(const FileName: TFileName): String;
+function WriteDelphiPlatformInfo(var DelphiPlatform: TDelphiPlatform; const DelphiBDSVer: String; const APlatform: String): Boolean;
+function WriteDelphiInfo(const ADelphiVersion: TDelphiVersion; const DelphiBDSVer: String): Boolean;
 
 implementation
 
@@ -472,5 +474,96 @@ begin
     reg.Free;
   end;
 end;
+
+function WriteDelphiInfo(const ADelphiVersion: TDelphiVersion; const DelphiBDSVer: String): Boolean;
+var
+  reg: TRegistry;
+begin
+  Result := False;
+  reg := Nil;
+
+  try
+    try
+      reg := TRegistry.Create(KEY_READ);
+      reg.RootKey := HKEY_CURRENT_USER;
+
+      if reg.KeyExists(DelphiRegKey + '\' + DelphiBDSVer) then
+        begin
+          if reg.OpenKey(DelphiRegKey + '\' + DelphiBDSVer, False) then
+            begin
+              WriteDelphiPlatformInfo(ADelphiVersion.Android32, DelphiBDSVer, 'Android32');
+              WriteDelphiPlatformInfo(ADelphiVersion.Android64, DelphiBDSVer, 'Android64');
+              WriteDelphiPlatformInfo(ADelphiVersion.Linux64, DelphiBDSVer, 'Linux64');
+              WriteDelphiPlatformInfo(ADelphiVersion.OSX64, DelphiBDSVer, 'OSX64');
+              if DelphiBDSVer > '22.0' then
+                WriteDelphiPlatformInfo(ADelphiVersion.OSXARM64, DelphiBDSVer, 'OSXARM64');
+              WriteDelphiPlatformInfo(ADelphiVersion.Win32, DelphiBDSVer, 'Win32');
+              WriteDelphiPlatformInfo(ADelphiVersion.Win64, DelphiBDSVer, 'Win64');
+              {$IFDEF INCLUDE_IOS}
+              ReadDelphiPlatformInfo(ADelphiVersion.IOSDevice64, DelphiBDSVer, 'IOSDevice64');
+              ReadDelphiPlatformInfo(ADelphiVersion.IOSSimARM64, DelphiBDSVer, 'IOSSimARM64');
+              ReadDelphiPlatformInfo(ADelphiVersion.IOSSimulator, DelphiBDSVer, 'IOSSimulator');
+              {$ENDIF INCLUDE_IOS}
+              Result := True;
+              reg.CloseKey;
+            end;
+        end;
+    except
+      // Couldn't open registry
+      on E : Exception do
+        Raise Exception.Create('Couldn''t open registry');
+    end;
+  finally
+    reg.Free;
+  end;
+end;
+
+function WriteDelphiPlatformInfo(var DelphiPlatform: TDelphiPlatform; const DelphiBDSVer: String; const APlatform: String): Boolean;
+var
+  reg: TRegistry;
+  PlatformKey: String;
+begin
+// Computer\HKEY_CURRENT_USER\Software\Embarcadero\BDS\22.0\Library\Android32
+
+  Result := False;
+  reg := Nil;
+
+  try
+    try
+      reg := TRegistry.Create(KEY_SET_VALUE);
+      reg.RootKey := HKEY_CURRENT_USER;
+      PlatformKey := DelphiRegKey + '\' + DelphiBDSVer + '\Library\' + APlatform;
+      if reg.KeyExists(PlatformKey) then
+        begin
+          if reg.OpenKey(PlatformKey, False) then
+            begin
+              reg.WriteString('Search Path', DelphiPlatform.SearchPath);
+              reg.WriteString('Debug DCU Path', DelphiPlatform.DebugDCUPath);
+              {$IFDEF FULL_PLATFORM_DETAILS}
+              reg.WriteString('Browsing Path', DelphiPlatform.BrowsingPath);
+              reg.WriteString('HPP Output Directory', DelphiPlatform.HPPOutputDirectory);
+              reg.WriteString('Namespace Search Path', DelphiPlatform.NamespaceSearchPath);
+              reg.WriteString('Package DCP Output', DelphiPlatform.PackageDCPOutput);
+              reg.WriteString('Package DPL Output', DelphiPlatform.PackageDPLOutput);
+              reg.WriteString('Package Search Path', DelphiPlatform.PackageSearchPath);
+              reg.WriteString('Translated Debug Library Path', DelphiPlatform.TranslatedDebugLibraryPath);
+              reg.WriteString('Translated Library Path', DelphiPlatform.TranslatedLibraryPath);
+              reg.WriteString('Translated Resource Path', DelphiPlatform.TranslatedResourcePath);
+              {$ENDIF FULL_PLATFORM_DETAILS}
+
+              Result := True;
+              reg.CloseKey;
+            end;
+        end;
+    except
+      // Couldn't open registry
+      on E : Exception do
+        Raise Exception.Create('Couldn''t open registry');
+    end;
+  finally
+    reg.Free;
+  end;
+end;
+
 
 end.
