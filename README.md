@@ -10,3 +10,4 @@ Select your Delphi version (if you have more than one make sure the right one is
 
 It'll go and set all the paths correctly including some I've recently discovered
  
+The code's a mess ATM, badly needs refactoring, but it does work.
