@@ -35,6 +35,7 @@ type
     procedure MakeDelphiPrettyNames;
     procedure GetDelphiVersions;
     procedure ShowSelectedDelphi(const Clear: Boolean = True);
+    function HavePath(const SomePaths: String; const PathToFind: String; const Exact: Boolean = False): Boolean;
   public
     { Public declarations }
   end;
@@ -55,6 +56,32 @@ const
   P4DPD = 'python4delphi';
 
 {$R *.fmx}
+
+function TForm1.HavePath(const SomePaths: String; const PathToFind: String; const Exact: Boolean = False): Boolean;
+var
+  Dirs: TStringList;
+  I: Integer;
+begin
+  Result := False;
+  Dirs := TStringList.Create;
+  SplitPaths(SomePaths, Dirs);
+
+  for I := Dirs.Count - 1 downto 0 do
+    begin
+      if Exact then
+        begin
+          if Dirs[I] = PathToFind then
+            Result := True;
+        end
+      else
+        begin
+          if Dirs[I].Contains(PathToFind) then
+            Result := False;
+        end
+    end;
+
+  Dirs.Free;
+end;
 
 procedure TForm1.RemovePath(var SomePaths: String; const PathToRemove: String; const Exact: Boolean = False);
 var
@@ -181,6 +208,14 @@ begin
       AddPackagePaths(P4DPE);
       AddPackagePaths(P4DPP);
       AddPackagePaths(P4DPD);
+
+      RemovePath(SelectedDelphiVersion.Win64.SearchPath, '$(BDSCOMMONDIR)\Dcp', True);
+      if not HavePath(SelectedDelphiVersion.Win64.SearchPath, '$(BDSCOMMONDIR)\Dcp\$(Platform)', True) then
+        AddPath(SelectedDelphiVersion.Win64.SearchPath, '$(BDSCOMMONDIR)\Dcp\$(Platform)');
+      if not HavePath(SelectedDelphiVersion.Android32.SearchPath, '$(BDSCOMMONDIR)\Dcp\$(Platform)', True) then
+        AddPath(SelectedDelphiVersion.Android32.SearchPath, '$(BDSCOMMONDIR)\Dcp\$(Platform)');
+      if not HavePath(SelectedDelphiVersion.Android64.SearchPath, '$(BDSCOMMONDIR)\Dcp\$(Platform)', True) then
+        AddPath(SelectedDelphiVersion.Android64.SearchPath, '$(BDSCOMMONDIR)\Dcp\$(Platform)');
 
       WriteDelphiInfo(SelectedDelphiVersion, SelectedDelphiVersion.BDSVer);
 
